@@ -2,7 +2,7 @@
 set -e
 
 REGISTRY="localhost:5000"
-APPS=("anniversary" "celebration" "devops-app" "ganesh_harini" "tom_and_jerry")
+APPS=("anniversary" "celebration" "devops-app" "ganesh-harini" "tom-and-jerry")
 
 echo "=== Building and pushing Docker images ==="
 for APP in "${APPS[@]}"; do
