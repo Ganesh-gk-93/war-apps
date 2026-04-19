@@ -2,11 +2,7 @@
 set -e
 
 REGISTRY="localhost:5000"
-
-# These match your actual WAR filenames (underscores)
 DOCKER_APPS=("anniversary" "celebration" "devops-app" "ganesh_harini" "tom_and_jerry")
-
-# These match your Kubernetes deployment metadata.name (hyphens)
 K8S_APPS=("anniversary" "celebration" "devops-app" "ganesh-harini" "tom-and-jerry")
 
 echo "=== Building and pushing Docker images ==="
@@ -16,6 +12,12 @@ for APP in "${DOCKER_APPS[@]}"; do
     -t $REGISTRY/$APP:latest \
     -f docker/Dockerfile .
   docker push $REGISTRY/$APP:latest
+done
+
+echo "=== Loading images into Minikube ==="
+for APP in "${DOCKER_APPS[@]}"; do
+  echo "--- Loading $APP into minikube ---"
+  minikube image load $REGISTRY/$APP:latest
 done
 
 echo "=== Deploying to Kubernetes ==="

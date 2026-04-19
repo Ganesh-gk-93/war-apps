@@ -15,6 +15,7 @@ spec:
       containers:
       - name: devops-app
         image: localhost:5000/devops-app:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 8080
 ---
