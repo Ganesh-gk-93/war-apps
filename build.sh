@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+export MINIKUBE_HOME=/var/lib/jenkins/.minikube
+export KUBECONFIG=/var/lib/jenkins/.kube/config
+
 K8S_APPS=("anniversary" "celebration" "devops-app" "ganesh-harini" "tom-and-jerry")
 
 echo "=== Using VM Docker daemon ==="
@@ -15,12 +18,11 @@ docker build --build-arg APP_NAME=tom_and_jerry -t tom-and-jerry:latest -f docke
 
 echo "=== Loading images into Minikube ==="
 for APP in "${K8S_APPS[@]}"; do
-  echo "--- Loading $APP into minikube ---"
+  echo "--- Loading $APP ---"
   docker save $APP:latest | minikube ssh --native-ssh=false -- docker load
 done
 
 echo "=== Deploying to Kubernetes ==="
-export KUBECONFIG=/var/lib/jenkins/.kube/config
 kubectl config use-context minikube
 
 for YAML in k8s/*.yaml; do
