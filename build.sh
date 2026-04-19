@@ -1,19 +1,22 @@
 #!/bin/bash
 set -e
 
-REGISTRY="localhost:5000"
-DOCKER_APPS=("anniversary" "celebration" "devops-app" "ganesh_harini" "tom_and_jerry")
 K8S_APPS=("anniversary" "celebration" "devops-app" "ganesh-harini" "tom-and-jerry")
 
-echo "=== Pointing Docker to Minikube's daemon ==="
-eval $(minikube docker-env)
+echo "=== Using VM Docker daemon ==="
+eval $(minikube docker-env --unset)
 
-echo "=== Building images inside Minikube Docker ==="
-for APP in "${DOCKER_APPS[@]}"; do
-  echo "--- Building $APP ---"
-  docker build --build-arg APP_NAME=$APP \
-    -t $APP:latest \
-    -f docker/Dockerfile .
+echo "=== Building Docker images ==="
+docker build --build-arg APP_NAME=anniversary   -t anniversary:latest   -f docker/Dockerfile .
+docker build --build-arg APP_NAME=celebration   -t celebration:latest   -f docker/Dockerfile .
+docker build --build-arg APP_NAME=devops-app    -t devops-app:latest    -f docker/Dockerfile .
+docker build --build-arg APP_NAME=ganesh_harini -t ganesh-harini:latest -f docker/Dockerfile .
+docker build --build-arg APP_NAME=tom_and_jerry -t tom-and-jerry:latest -f docker/Dockerfile .
+
+echo "=== Loading images into Minikube ==="
+for APP in "${K8S_APPS[@]}"; do
+  echo "--- Loading $APP into minikube ---"
+  docker save $APP:latest | minikube ssh --native-ssh=false -- docker load
 done
 
 echo "=== Deploying to Kubernetes ==="
@@ -29,6 +32,6 @@ for APP in "${K8S_APPS[@]}"; do
   kubectl rollout status deployment/$APP --timeout=180s
 done
 
-echo "=== Done! Apps running ==="
+echo "=== Done! ==="
 kubectl get pods -o wide
 kubectl get svc
