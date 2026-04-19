@@ -14,16 +14,20 @@ for APP in "${APPS[@]}"; do
 done
 
 echo "=== Deploying to Kubernetes ==="
-# Point kubectl to minikube
-export KUBECONFIG=$HOME/.kube/config
+
+# FIX 1: Point to jenkins user's kubeconfig (not $HOME which may resolve wrong)
+export KUBECONFIG=/var/lib/jenkins/.kube/config
+
 kubectl config use-context minikube
 
 for YAML in k8s/*.yaml; do
-  kubectl apply -f $YAML
+  # FIX 2: Add --validate=false to avoid openapi download errors
+  kubectl apply -f $YAML --validate=false
 done
 
 echo "=== Rollout status ==="
 for APP in "${APPS[@]}"; do
+  # FIX 3: deployment name must match your YAML metadata.name exactly
   kubectl rollout status deployment/$APP --timeout=120s
 done
 
