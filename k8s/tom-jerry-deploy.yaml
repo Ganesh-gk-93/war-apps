@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: tom-and-jerry    # hyphen not underscore
-        image: localhost:5000/tom_and_jerry:latest
+        image: tom-and-jerry:latest # hyphen not underscore
         imagePullPolicy: Never
         ports:
         - containerPort: 8080

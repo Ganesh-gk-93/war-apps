@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: celebration
-        image: localhost:5000/celebration:latest
+        image: celebration:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8080

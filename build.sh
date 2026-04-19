@@ -5,19 +5,15 @@ REGISTRY="localhost:5000"
 DOCKER_APPS=("anniversary" "celebration" "devops-app" "ganesh_harini" "tom_and_jerry")
 K8S_APPS=("anniversary" "celebration" "devops-app" "ganesh-harini" "tom-and-jerry")
 
-echo "=== Building and pushing Docker images ==="
+echo "=== Pointing Docker to Minikube's daemon ==="
+eval $(minikube docker-env)
+
+echo "=== Building images inside Minikube Docker ==="
 for APP in "${DOCKER_APPS[@]}"; do
   echo "--- Building $APP ---"
   docker build --build-arg APP_NAME=$APP \
-    -t $REGISTRY/$APP:latest \
+    -t $APP:latest \
     -f docker/Dockerfile .
-  docker push $REGISTRY/$APP:latest
-done
-
-echo "=== Loading images into Minikube ==="
-for APP in "${DOCKER_APPS[@]}"; do
-  echo "--- Loading $APP into minikube ---"
-  minikube image load $REGISTRY/$APP:latest
 done
 
 echo "=== Deploying to Kubernetes ==="
@@ -30,7 +26,7 @@ done
 
 echo "=== Rollout status ==="
 for APP in "${K8S_APPS[@]}"; do
-  kubectl rollout status deployment/$APP --timeout=120s
+  kubectl rollout status deployment/$APP --timeout=180s
 done
 
 echo "=== Done! Apps running ==="

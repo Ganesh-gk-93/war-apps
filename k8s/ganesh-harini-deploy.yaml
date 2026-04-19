@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ganesh-harini    # hyphen not underscore
-        image: localhost:5000/ganesh_harini:latest
+        image: ganesh-harini:latest # hyphen not underscore
         imagePullPolicy: Never # underscore OK here (Docker image name)
         ports:
         - containerPort: 8080

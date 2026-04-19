@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: anniversary
-        image: localhost:5000/anniversary:latest
+        image: anniversary:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8080
