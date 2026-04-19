@@ -15,8 +15,8 @@ pipeline {
         stage('Build & Deploy') {
             steps {
                 sh '''
-                    chmod +x scripts/build.sh
-                    ./scripts/build.sh
+                    chmod +x build.sh
+                    ./build.sh
                 '''
             }
         }
