@@ -1,0 +1,45 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: war-apps-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: war-apps.pod-health
+      rules:
+        - alert: PodDown
+          expr: up{namespace="default"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod {{ $labels.pod }} is DOWN"
+
+        - alert: PodCrashLooping
+          expr: rate(kube_pod_container_status_restarts_total{namespace="default"}[5m]) > 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod {{ $labels.pod }} is crash-looping"
+
+        - alert: HighMemoryUsage
+          expr: |
+            container_memory_usage_bytes{namespace="default", container!=""}
+            / container_spec_memory_limit_bytes{namespace="default", container!=""} > 0.85
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory in {{ $labels.container }}"
+
+        - alert: HighCPUUsage
+          expr: |
+            rate(container_cpu_usage_seconds_total{namespace="default", container!=""}[5m]) > 0.8
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU in {{ $labels.container }}"
